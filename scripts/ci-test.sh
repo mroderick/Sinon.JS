@@ -7,6 +7,8 @@ function finish {
     else
       kill $(jobs -pr)
     fi
+
+    pkill -P 1 -u $(id -u) -n xulrunner # clean up any leftover xulrunner processes from slimerjs
 }
 
 trap finish SIGINT SIGTERM EXIT
