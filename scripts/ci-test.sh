@@ -10,6 +10,7 @@ function finish {
 }
 
 trap finish SIGINT SIGTERM EXIT
+# trap "kill -- -$BASHPID" SIGINT SIGTERM EXIT
 
 echo
 echo starting buster-server
@@ -17,8 +18,8 @@ echo starting buster-server
 sleep 4 # takes a while for buster server to start
 
 echo
-echo starting phantomjs
-phantomjs ./node_modules/buster/script/phantom.js &
+echo starting slimerjs
+./node_modules/.bin/slimerjs --load-images=false ./node_modules/buster/script/phantom.js &
 sleep 1 # give phantomjs a second to warm up
 
 echo
