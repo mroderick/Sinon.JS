@@ -1,16 +1,21 @@
 #!/bin/bash
 set -eu
 
+# The processes inherit the process group id from the leader, which is its PID
+# http://unix.stackexchange.com/a/139230/18594
+PGID=$$
+
 function finish {
     if [ -n "${TRAVIS+1}" ]; then
       echo "TRAVIS detected, skip killing child processes"
     else
-      pkill -P 1 -u $(id -u) -n xulrunner # clean up any leftover xulrunner processes from slimerjs
+      # clean up xulrunner process from slimerjs, and any other remaining processes
+      kill -- "-$PGID" 
     fi
+
 }
 
 trap finish SIGINT SIGTERM EXIT
-# trap "kill -- -$BASHPID" SIGINT SIGTERM EXIT
 
 echo
 echo starting buster-server
