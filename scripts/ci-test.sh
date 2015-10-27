@@ -1,21 +1,26 @@
 #!/bin/bash
 set -eu
 
-# The processes inherit the process group id from the leader, which is its PID
+# A process inherit the process group id from the leader
+# In our case, this is either the pid of this script, or the pid of `npm`
 # http://unix.stackexchange.com/a/139230/18594
-PGID=$$
+PGID=$(ps -o pgid= $$) >&2
+SIGNALS="SIGINT SIGTERM EXIT"
 
 function finish {
+    # remove trap to not enter recursive calls
+    trap - $SIGNALS
+
     if [ -n "${TRAVIS+1}" ]; then
       echo "TRAVIS detected, skip killing child processes"
     else
       # clean up xulrunner process from slimerjs, and any other remaining processes
-      kill -- "-$PGID" 
+      kill -- -$PGID 
     fi
 
 }
 
-trap finish SIGINT SIGTERM EXIT
+trap finish $SIGNALS
 
 echo
 echo starting buster-server
